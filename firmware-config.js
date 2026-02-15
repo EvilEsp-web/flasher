@@ -6,3 +6,4 @@ const hardcodedFirmware = [
    {id: "eviltools", name: "Evil ESP32 Tools", version: "1.0", category: "Kutas", platform: "esp32", manifest: "evil_esp32_tools_bin/manifest.json"} 
 
 ];
+
