@@ -1,5 +1,5 @@
 {
-  "name": "esp32-div",
+  "name": "esp32-div-v2",
     "version": "2.0",
   "new_install_prompt_erase": true,
   "builds": [
@@ -12,4 +12,5 @@
       ]
     }
   ]
+
 }
