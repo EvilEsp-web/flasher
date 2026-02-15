@@ -34,14 +34,8 @@ body::before {
 }
 
 /* ===== FLASH BUTTON PULSE ===== */
-#flashButton:hover {
-  transform: translateX(-50%) scale(1.05);
-  box-shadow: 0 0 25px #00ff99, 0 0 50px #00ff99;
-  color: #fff;
-}
-
 #flashButton {
- position: fixed;
+  position: fixed;
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
@@ -57,11 +51,14 @@ body::before {
   font-weight: bold;
   font-size: 16px;
   cursor: pointer;
-
-  /* statyczny neon */
   box-shadow: 0 0 15px #00ff99, 0 0 30px #00ff99;
-
   transition: all 0.25s ease;
+}
+
+#flashButton:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 0 25px #00ff99, 0 0 50px #00ff99;
+  color: #fff;
 }
 
 
@@ -159,32 +156,6 @@ footer {
   color: #008866;
 }
 
-#flashButton {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 150px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #000;
-  border: 2px solid #00ff99;
-  border-radius: 25px;
-  color: #00ff99;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 0 0 15px #00ff99, 0 0 30px #00ff99;
-}
-
-#flashButton:hover {
-  transform: translateX(-50%) scale(1.1);
-  box-shadow: 0 0 25px #00ff99, 0 0 50px #00ff99;
-  color: #fff;
-}
-
 #firmwareModal {
   position: fixed;
   inset: 0;
@@ -204,12 +175,8 @@ footer {
   max-width: 420px;
   box-shadow: 0 0 20px #00ff99, 0 0 40px rgba(0,255,153,0.4);
   text-align: center;
-
   max-height: 75vh;
   overflow-y: auto;
-
-  box-shadow: 0 0 20px #00ff99, 0 0 40px rgba(0,255,153,0.4);
-  text-align: center;
 }
 
 .firmwareList {
@@ -433,65 +400,13 @@ footer {
   <div class="modalBox">
     <h2>Select Firmware</h2>
 
-    <!-- Hacker Firmware -->
-<div class="categoryHeader"> Bad Firmware</div>
-<div class="categoryContent">
-  <ul class="firmwareList">
-    <li id="nrf">nRF_Jammer_V3 | esp32</li>
-  </ul>
-</div>
+    <!-- Dynamicznie generowana zawartość z firmware -->
+    <div id="firmwareContainer"></div>
 
-
-
-    <!-- AI Firmware -->
-<div class="categoryHeader"> AI</div>
-<div class="categoryContent">
-  <ul class="firmwareList">
-    <li id="polishai">uart AI | esp32</li>
-  </ul>
-</div>
-
-
-    <!-- Games -->
-<div class="categoryHeader"> Games</div>
-<div class="categoryContent">
-  <ul class="firmwareList">
-    <li class="coming">Coming Soon...</li>
-  </ul>
-</div>
-
-
-    <!-- Beta -->
-<div class="categoryHeader">Beta</div>
-<div class="categoryContent">
-  <ul class="firmwareList">
-    <li class="coming">Coming Soon...</li>
-  </ul>
-</div>
-
-
-    <!-- Other -->
-<div class="categoryHeader">Other</div>
-<div class="categoryContent">
-  <ul class="firmwareList">
-    <li class="coming">Coming Soon...</li>
-  </ul>
-</div>
-
+    <!-- Kontener na ukryte przyciski instalacyjne -->
+    <div id="installButtonsContainer" style="display:none"></div>
 
     <button id="closeModal">CLOSE</button>
-
-    <!-- Ukryte przyciski instalacyjne -->
-    <esp-web-install-button
-      id="installBtn"
-      manifest="nRF_Jammer_V3_bin/manifest.json"
-      style="display:none"></esp-web-install-button>
-
-    <esp-web-install-button
-      id="installPolishAI"
-      manifest="Polish_AI_SD/manifest.json"
-      style="display:none"></esp-web-install-button>
-
   </div>
 </div>
 
@@ -500,60 +415,97 @@ footer {
 const flashBtn = document.getElementById("flashButton");
 const modal = document.getElementById("firmwareModal");
 const closeBtn = document.getElementById("closeModal");
+const firmwareContainer = document.getElementById("firmwareContainer");
+const installButtonsContainer = document.getElementById("installButtonsContainer");
 
-// Przyciski firmware
-const nrfBtn = document.getElementById("nrf");
-const installBtn = document.getElementById("installBtn");
+let firmwareConfig = [];
+let installButtons = {};
 
-const polishBtn = document.getElementById("polishai");
-const installPolishAI = document.getElementById("installPolishAI");
+// Firmware - hardcoded
+const hardcodedFirmware = [
+  {id: "nrf", name: "nRF_Jammer_V3", version: "3.0", category: "Bad Firmware", platform: "esp32", manifest: "nRF_Jammer_V3_bin/manifest.json"},
+  {id: "polishai", name: "uart AI", version: "1.0", category: "AI", platform: "esp32", manifest: "Polish_AI_SD/manifest.json"},
+  {id: "eviltools", name: "Evil ESP32 Tools", version: "1.0", category: "Tools", platform: "esp32", manifest: "evil_esp32_tools_bin/manifest.json"}
+];
 
-// Otwarcie modalnego okna
-flashBtn.onclick = () => modal.style.display = "flex";
-
-// Zamknięcie
-closeBtn.onclick = () => modal.style.display = "none";
-
-// Kliknięcie nRF Jammer
-nrfBtn.onclick = () => {
-  modal.style.display = "none";
-  try { installBtn.shadowRoot.querySelector("button").click(); }
-  catch(e) { console.error("WebSerial error:", e); resetView(); }
-};
-
-// Kliknięcie Polish AI
-polishBtn.onclick = () => {
-  modal.style.display = "none";
-  try { installPolishAI.shadowRoot.querySelector("button").click(); }
-  catch(e) { console.error("WebSerial error:", e); resetView(); }
-};
-
-// Eventy dla instalacji
-installBtn.addEventListener("install-success", resetView);
-installBtn.addEventListener("install-error", resetView);
-
-installPolishAI.addEventListener("install-success", resetView);
-installPolishAI.addEventListener("install-error", resetView);
-
-function resetView() {
-  setTimeout(() => {
-    modal.style.display = "none";
-  }, 500);
+function loadFirmwareConfig() {
+  firmwareConfig = hardcodedFirmware;
+  generateFirmwareUI();
 }
 
-</script>
-
-<script>
-document.querySelectorAll(".categoryHeader").forEach(header => {
-  header.addEventListener("click", () => {
-    header.classList.toggle("active");
-
-    const content = header.nextElementSibling;
-    content.classList.toggle("open");
+function generateFirmwareUI() {
+  // Grupowanie po kategoriach
+  const categories = {};
+  firmwareConfig.forEach(fw => {
+    if (!categories[fw.category]) categories[fw.category] = [];
+    categories[fw.category].push(fw);
   });
-});
+
+  // HTML kategorii
+  let html = "";
+  Object.keys(categories).forEach(category => {
+    html += `<div class="categoryHeader">${category}</div>`;
+    html += `<div class="categoryContent">`;
+    html += `<ul class="firmwareList">`;
+    categories[category].forEach(fw => {
+      html += `<li data-fw-id="${fw.id}" class="firmware-item">${fw.name} v${fw.version} | ${fw.platform}</li>`;
+    });
+    html += `</ul></div>`;
+  });
+  firmwareContainer.innerHTML = html;
+
+  // Dynamiczne przyciski instalacyjne
+  installButtonsContainer.innerHTML = "";
+  firmwareConfig.forEach(fw => {
+    const btn = document.createElement("esp-web-install-button");
+    btn.id = `install-${fw.id}`;
+    btn.setAttribute("manifest", fw.manifest);
+    btn.style.display = "none";
+    installButtonsContainer.appendChild(btn);
+    installButtons[fw.id] = btn;
+
+    // Eventy WebSerial
+    btn.addEventListener("install-success", resetView);
+    btn.addEventListener("install-error", resetView);
+  });
+
+  // Event listener do firmware
+  document.querySelectorAll(".firmware-item").forEach(item => {
+    item.addEventListener("click", e => {
+      const fwId = e.target.getAttribute("data-fw-id");
+      if (fwId && installButtons[fwId]) {
+        modal.style.display = "none";
+        try {
+          installButtons[fwId].shadowRoot.querySelector("button").click();
+        } catch(err) {
+          console.error("WebSerial error:", err);
+          resetView();
+        }
+      }
+    });
+  });
+
+  // Event listener do kategorii (expand/collapse)
+  document.querySelectorAll(".categoryHeader").forEach(header => {
+    header.addEventListener("click", () => {
+      header.classList.toggle("active");
+      const content = header.nextElementSibling;
+      content.classList.toggle("open");
+    });
+  });
+}
+
+// Modal open/close
+flashBtn.onclick = () => modal.style.display = "flex";
+closeBtn.onclick = () => modal.style.display = "none";
+
+function resetView() {
+  setTimeout(() => { modal.style.display = "none"; }, 500);
+}
+
+// Start
+loadFirmwareConfig();
 </script>
 
 </body>
 </html>
-
