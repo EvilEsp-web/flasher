@@ -379,7 +379,7 @@ footer {
 
   <!-- GitHub -->
   <a class="socialLink github"
-     href="https://github.com/natanielweremczuk8-hash"
+     href="https://github.com/EvilEsp-web"
      target="_blank">
     My GitHub
   </a>
@@ -421,11 +421,13 @@ const installButtonsContainer = document.getElementById("installButtonsContainer
 let firmwareConfig = [];
 let installButtons = {};
 
-// Firmware - hardcoded
+// ------------------Firmware - hardcoded--------------------------=======================================================================================
 const hardcodedFirmware = [
   {id: "nrf", name: "nRF_Jammer_V3", version: "3.0", category: "Bad Firmware", platform: "esp32", manifest: "nRF_Jammer_V3_bin/manifest.json"},
-  {id: "polishai", name: "uart AI", version: "1.0", category: "AI", platform: "esp32", manifest: "Polish_AI_SD/manifest.json"},
-  {id: "eviltools", name: "Evil ESP32 Tools", version: "1.0", category: "Kutas", platform: "esp32", manifest: "evil_esp32_tools_bin/manifest.json"}
+  {id: "polishai", name: "uart AI (polish lang)", version: "1.0", category: "AI", platform: "esp32", manifest: "Polish_AI_SD/manifest.json"},
+  {id: "eviltools", name: "Evil ESP32 Tools", version: "1.0(Beta)", category: "Beta", platform: "esp32", manifest: "evil_esp32_tools_bin/manifest.json"},
+  {id: "eviltools", name: "Evil ESP32 Tools s3", version: "1.0(Beta)", category: "Beta", platform: "esp32s3", manifest: "evil_esp32_tools_bin_esp32s3/manifest.json"},
+  {id: "eviltools", name: "ESP32-div", version: "v2", category: "Third-Party Firmware", platform: "esp32s3", manifest: "esp32-div-v2/manifest.json"}
 ];
 
 function loadFirmwareConfig() {
@@ -509,4 +511,5 @@ loadFirmwareConfig();
 
 </body>
 </html>
+
 
